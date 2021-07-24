@@ -4,8 +4,7 @@ app = FastAPI()
 
 
 @app.get("/encode")
-async def encode():
-    message = e("image", "good").printer()
+async def encode(image, message):
     return {"message": message}
 
 
