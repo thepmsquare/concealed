@@ -1,6 +1,7 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from encode import encode as e
+from decode import decode as d
 from pydantic import BaseModel
 app = FastAPI()
 
@@ -15,12 +16,23 @@ class Encode(BaseModel):
     message: str
     image: str
 
+
+class Decode(BaseModel):
+    image: str
+
 # POST request because browsers do not allow GET request with a body
 
 
 @app.post("/encode")
 async def encode(encode: Encode):
-    return {"encode": encode.message}
+    result = e(encode.image, encode.message).run()
+    return {"image": result}
+
+
+@app.post("/decode")
+async def decode(decode: Decode):
+    result = d(decode.image).run()
+    return {"message": result}
 
 
 @app.get("/")
