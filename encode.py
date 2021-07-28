@@ -2,6 +2,7 @@ from PIL import Image
 import re
 from io import BytesIO
 import base64
+from fastapi import HTTPException
 
 
 class encode:
@@ -52,6 +53,12 @@ class encode:
     def put_message_in_image(self):
         pixels = self.im.load()
         copy_encoded_message = self.encoded_message
+        msg_length = len(copy_encoded_message)
+        max_length = self.im.width * self.im.height * 3 * 2
+        if(msg_length > max_length):
+            raise HTTPException(
+                status_code=400, detail="Image with more pixels needed for encoding current message.")
+
         for i in range(0, self.im.width):
             for j in range(0, self.im.height):
                 rm = copy_encoded_message[0:2] if copy_encoded_message[0:2] else "00"
@@ -71,10 +78,13 @@ class encode:
         return "data:image/"+self.format+";base64,"+str(base64.b64encode(buffered.getvalue()))[2:l-1]
 
     def run(self):
-        self.remove_prefix()
-        self.decode_from_base64()
-        self.convert_to_rgb()
-        self.convert_message_to_binary()
-        self.put_message_in_image()
+        try:
+            self.remove_prefix()
+            self.decode_from_base64()
+            self.convert_to_rgb()
+            self.convert_message_to_binary()
+            self.put_message_in_image()
 
-        return(self.convert_PIL_image_to_data64())
+            return(self.convert_PIL_image_to_data64())
+        except:
+            raise

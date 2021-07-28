@@ -25,8 +25,11 @@ class Decode(BaseModel):
 
 @app.post("/encode")
 async def encode(encode: Encode):
-    result = e(encode.image, encode.message).run()
-    return {"image": result}
+    try:
+        result = e(encode.image, encode.message).run()
+        return {"image": result}
+    except:
+        raise
 
 
 @app.post("/decode")
