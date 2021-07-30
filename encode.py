@@ -52,24 +52,29 @@ class encode:
 
     def put_message_in_image(self):
         pixels = self.im.load()
-        copy_encoded_message = self.encoded_message
+        copy_encoded_message = self.encoded_message+"10"
         msg_length = len(copy_encoded_message)
         max_length = self.im.width * self.im.height * 3 * 2
         if(msg_length > max_length):
             raise HTTPException(
                 status_code=400, detail="Image with more pixels needed for encoding current message.")
+        pixel_number = [0, 0]
+        for i in range(0, msg_length, 6):
+            rm = copy_encoded_message[i:i+2]
+            gm = copy_encoded_message[i+2:i+4]
+            bm = copy_encoded_message[i+4:i+6]
 
-        for i in range(0, self.im.width):
-            for j in range(0, self.im.height):
-                rm = copy_encoded_message[0:2] if copy_encoded_message[0:2] else "00"
-                gm = copy_encoded_message[2:4] if copy_encoded_message[2:4] else "00"
-                bm = copy_encoded_message[4:6] if copy_encoded_message[4:6] else "00"
-                r = int(format(pixels[i, j][0], '08b')[0:6]+rm, 2)
-                g = int(format(pixels[i, j][1], '08b')[0:6]+gm, 2)
-                b = int(format(pixels[i, j][2], '08b')[0:6]+bm, 2)
-                if copy_encoded_message[6:]:
-                    copy_encoded_message = copy_encoded_message[6:]
-                pixels[i, j] = (r, g, b)
+            r = int(
+                format(pixels[pixel_number[0], pixel_number[1]][0], '08b')[0:6]+rm, 2)
+            g = int(
+                format(pixels[pixel_number[0], pixel_number[1]][0], '08b')[0:6]+gm, 2)
+            b = int(
+                format(pixels[pixel_number[0], pixel_number[1]][0], '08b')[0:6]+bm, 2)
+            if(pixel_number[0] < self.im.width):
+                pixel_number[0] = pixel_number[0] + 1
+            else:
+                pixel_number[0] = 0
+                pixel_number[1] = pixel_number[1] + 1
 
     def convert_PIL_image_to_data64(self):
         buffered = BytesIO()
