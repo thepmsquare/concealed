@@ -11,16 +11,32 @@ class encode:
         self.message = message
 
     def remove_prefix(self):
-        self.format = self.image[11:self.image.index(";")]
-        self.data = re.sub('^data:image/.+;base64,', '',
-                           self.image)
+        try:
+            # can also be get by self.im.format but it is in uppercase and gives slightly different results for me for eg., jpg -> JPEG.
+            self.format = self.image[11:self.image.index(";")]
+            self.data = re.sub('^data:image/.+;base64,', '',
+                               self.image)
+        except Exception as e:
+            raise HTTPException(
+                status_code=400, detail="base64 image data with prefix 'data:image/{format};base64,' is needed to encode a message.")
 
     def decode_from_base64(self):
-        self.image_data = base64.b64decode(self.data)
+        try:
+            self.image_data = base64.b64decode(self.data)
+            # idk why this doesn't raise error in case of invalid base64
+        except Exception as e:
+            raise HTTPException(
+                status_code=400, detail="Invalid base64-encoded string.")
 
     def convert_to_rgb(self):
-        with Image.open(BytesIO(self.image_data)) as self.im:
-            self.im = self.im.convert("RGB")
+        try:
+            with Image.open(BytesIO(self.image_data)) as self.im:
+                self.im = self.im.convert("RGB")
+
+        # probably will never occur.
+        except Exception as e:
+            raise HTTPException(
+                status_code=400, detail=str(e))
 
     def convert_message_to_binary(self):
         self.encoded_message = ""
