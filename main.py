@@ -34,8 +34,11 @@ async def encode(encode: Encode):
 
 @app.post("/decode")
 async def decode(decode: Decode):
-    result = d(decode.image).run()
-    return {"message": result}
+    try:
+        result = d(decode.image).run()
+        return result
+    except:
+        raise
 
 
 @app.get("/")
