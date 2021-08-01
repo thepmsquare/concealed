@@ -27,7 +27,7 @@ class Decode(BaseModel):
 async def encode(encode: Encode):
     try:
         result = e(encode.image, encode.message).run()
-        return {"image": result}
+        return result
     except:
         raise
 
