@@ -19,14 +19,13 @@ class encode:
                 status_code=400, detail="Image cannot be empty.")
 
     def remove_prefix(self):
-        try:
-            # can also be done by self.im.format but it is in uppercase and gives slightly different results for me for eg., jpg -> JPEG.
-            self.format = self.image[11:self.image.index(";")]
-            self.data = re.sub('^data:image/.+;base64,', '',
-                               self.image)
-        except Exception:
+        if(re.search('^data:image/.+;base64,', self.image) == None):
             raise HTTPException(
                 status_code=400, detail="base64 image data with prefix 'data:image/{format};base64,' is needed to encode a message.")
+        # can also be done by self.im.format but it is in uppercase and gives slightly different results for me for eg., jpg -> JPEG.
+        self.format = self.image[11:self.image.index(";")]
+        self.data = re.sub('^data:image/.+;base64,', '',
+                           self.image)
 
     def decode_from_base64(self):
         try:
@@ -129,7 +128,6 @@ class encode:
             else:
                 pixel_number[0] = 0
                 pixel_number[1] = pixel_number[1] + 1
-        print(self.pixel_count)
 
     def convert_PIL_image_to_data64(self):
         buffered = BytesIO()
