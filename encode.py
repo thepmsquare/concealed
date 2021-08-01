@@ -22,8 +22,6 @@ class encode:
         if(re.search('^data:image/.+;base64,', self.image) == None):
             raise HTTPException(
                 status_code=400, detail="base64 image data with prefix 'data:image/{format};base64,' is needed to encode a message.")
-        # can also be done by self.im.format but it is in uppercase and gives slightly different results for me for eg., jpg -> JPEG.
-        self.format = self.image[11:self.image.index(";")]
         self.data = re.sub('^data:image/.+;base64,', '',
                            self.image)
 
@@ -131,9 +129,9 @@ class encode:
 
     def convert_PIL_image_to_data64(self):
         buffered = BytesIO()
-        self.im.save(buffered, format=self.format)
+        self.im.save(buffered, format="png")
         l = len(str(base64.b64encode(buffered.getvalue())))
-        return "data:image/"+self.format+";base64,"+str(base64.b64encode(buffered.getvalue()))[2:l-1]
+        return "data:image/png;base64,"+str(base64.b64encode(buffered.getvalue()))[2:l-1]
 
     def run(self):
         try:
