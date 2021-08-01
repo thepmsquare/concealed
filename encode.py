@@ -142,6 +142,6 @@ class encode:
             self.convert_message_to_binary()
             self.put_message_in_image()
             image = self.convert_PIL_image_to_data64()
-            return({"image": image, "noOfPixelsModified": self.pixel_count, "percentOfImageModified": (self.pixel_count/self.max_length)*100})
+            return({"image": image, "noOfPixelsModified": self.pixel_count, "percentOfImageModified": (self.pixel_count/(self.im.width*self.im.height))*100})
         except:
             raise
