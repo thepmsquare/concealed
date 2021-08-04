@@ -87,15 +87,21 @@ class decode:
                     # 2 bit
                     if(current_chr[0:3] == "110"):
                         append_this = current_chr[3:] + self.get_2n_bits(2)
-                        self.get_2n_bits(1)
+                        if self.get_2n_bits(1) != "10":
+                            raise HTTPException(
+                                status_code=400, detail="Input image doesn't appear to have any encoded message.")
                         append_this = append_this + self.get_2n_bits(3)
                         self.binary_data.append(append_this)
                     # 3 bit
                     elif(current_chr == "1110"):
                         append_this = self.get_2n_bits(2)
-                        self.get_2n_bits(1)
+                        if self.get_2n_bits(1) != "10":
+                            raise HTTPException(
+                                status_code=400, detail="Input image doesn't appear to have any encoded message.")
                         append_this = append_this + self.get_2n_bits(3)
-                        self.get_2n_bits(1)
+                        if self.get_2n_bits(1) != "10":
+                            raise HTTPException(
+                                status_code=400, detail="Input image doesn't appear to have any encoded message.")
                         append_this = append_this + self.get_2n_bits(3)
                         self.binary_data.append(append_this)
                     else:
@@ -103,11 +109,17 @@ class decode:
                         # 4 bits
                         if(current_chr[0:5] == "11110"):
                             append_this = current_chr[5:] + self.get_2n_bits(1)
-                            self.get_2n_bits(1)
+                            if self.get_2n_bits(1) != "10":
+                                raise HTTPException(
+                                    status_code=400, detail="Input image doesn't appear to have any encoded message.")
                             append_this = append_this + self.get_2n_bits(3)
-                            self.get_2n_bits(1)
+                            if self.get_2n_bits(1) != "10":
+                                raise HTTPException(
+                                    status_code=400, detail="Input image doesn't appear to have any encoded message.")
                             append_this = append_this + self.get_2n_bits(3)
-                            self.get_2n_bits(1)
+                            if self.get_2n_bits(1) != "10":
+                                raise HTTPException(
+                                    status_code=400, detail="Input image doesn't appear to have any encoded message.")
                             append_this = append_this + self.get_2n_bits(3)
                             self.binary_data.append(append_this)
                         else:
