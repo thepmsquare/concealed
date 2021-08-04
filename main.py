@@ -3,6 +3,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from encode import encode as e
 from decode import decode as d
 from pydantic import BaseModel
+import asyncio
+
 app = FastAPI()
 
 app.add_middleware(
@@ -24,18 +26,18 @@ class Decode(BaseModel):
 
 
 @app.post("/encode")
-async def encode(encodev: Encode):
+async def encode(encode_: Encode):
     try:
-        result = await e(encodev.image, encodev.message).run()
+        result = await asyncio.gather(e(encode_.image, encode_.message).run())
         return result
     except:
         raise
 
 
 @app.post("/decode")
-async def decode(decodev: Decode):
+async def decode(decode_: Decode):
     try:
-        result = await d(decodev.image).run()
+        result = await asyncio.gather(d(decode_.image).run())
         return result
     except:
         raise
