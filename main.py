@@ -26,7 +26,7 @@ class Decode(BaseModel):
 @app.post("/encode")
 async def encode(encodev: Encode):
     try:
-        result = e(encodev.image, encodev.message).run()
+        result = await e(encodev.image, encodev.message).run()
         return result
     except:
         raise
@@ -34,9 +34,8 @@ async def encode(encodev: Encode):
 
 @app.post("/decode")
 async def decode(decodev: Decode):
-    temp = decodev
     try:
-        result = d(decodev.image).run()
+        result = await d(decodev.image).run()
         return result
     except:
         raise
