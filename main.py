@@ -1,4 +1,4 @@
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from encode import encode as e
 from decode import decode as d
@@ -25,8 +25,9 @@ class Decode(BaseModel):
 
 
 @app.post("/encode")
-async def encode(encode_: Encode):
+async def encode(encode_: Encode, request_: Request):
     try:
+        await request_.body()
         result = e(encode_.image, encode_.message).run()
         return result
     except:
@@ -34,8 +35,9 @@ async def encode(encode_: Encode):
 
 
 @app.post("/decode")
-async def decode(decode_: Decode):
+async def decode(decode_: Decode, request_: Request):
     try:
+        await request_.body()
         result = d(decode_.image).run()
         return result
     except:
