@@ -135,11 +135,12 @@ class decode:
 
     def run(self):
         try:
-            self.initial_validation()
-            self.remove_prefix()
-            self.decode_from_base64()
-            self.convert_to_rgb()
-            self.get_binary_data()
-            return {"message": self.decode_message()}
+            # self.initial_validation()
+            # self.remove_prefix()
+            # self.decode_from_base64()
+            # self.convert_to_rgb()
+            # self.get_binary_data()
+            # return {"message": self.decode_message()}
+            return {"message": "good"}
         except:
             raise
