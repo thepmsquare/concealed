@@ -24,7 +24,7 @@ class Decode(BaseModel):
 # POST request because browsers do not allow GET request with a body
 
 
-@app.post("/encoder")
+@app.post("/encode")
 async def encode(encode_: Encode, request_: Request):
     try:
         await request_.body()
@@ -34,7 +34,7 @@ async def encode(encode_: Encode, request_: Request):
         raise
 
 
-@app.post("/decoder")
+@app.post("/decode")
 async def decode(decode_: Decode, request_: Request):
     try:
         await request_.body()
