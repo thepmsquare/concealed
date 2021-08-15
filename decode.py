@@ -6,38 +6,23 @@ from fastapi import HTTPException
 
 
 class decode:
-    def __init__(self, image):
+    def __init__(self, image, content_type):
         self.image = image
+        self.content_type = content_type
 
     def initial_validation(self):
-        if self.image == "":
+        if not self.content_type == "image/png":
             raise HTTPException(
-                status_code=400, detail="Image cannot be empty.")
-
-    def remove_prefix(self):
-        if(re.search('^data:image/png;base64,', self.image) == None):
-            raise HTTPException(
-                status_code=400, detail="base64 image data with prefix 'data:image/png;base64,' is needed to decode a message.")
-
-        self.data = re.sub('^data:image/png;base64,', '',
-                           self.image)
-
-    def decode_from_base64(self):
-        try:
-            self.image_data = base64.b64decode(self.data)
-        #  will raise error only if string is not base64. It doesn't know about image data.
-        except Exception:
-            raise HTTPException(
-                status_code=400, detail="Invalid base64-encoded string.")
+                status_code=400, detail="Unsupported image format. Currently supported formats: image/png.")
 
     def convert_to_rgb(self):
         try:
-            with Image.open(BytesIO(self.image_data)) as self.im:
+            with Image.open(BytesIO(self.image)) as self.im:
                 self.im = self.im.convert("RGB")
         # occurs if base64 string was not image data
-        except Exception:
+        except Exception as e:
             raise HTTPException(
-                status_code=400, detail="base64 image data with prefix 'data:image/png;base64,' is needed to decode a message.")
+                status_code=400, detail="Unable to convert image mode to RGB" + str(e))
 
     def get_2n_bits(self, number):
         result = ""
@@ -136,8 +121,6 @@ class decode:
     def run(self):
         try:
             self.initial_validation()
-            self.remove_prefix()
-            self.decode_from_base64()
             self.convert_to_rgb()
             self.get_binary_data()
             return {"message": self.decode_message()}

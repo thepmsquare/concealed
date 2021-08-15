@@ -1,47 +1,27 @@
 from PIL import Image
 import re
 from io import BytesIO
-import base64
 from fastapi import HTTPException
 
 
 class encode:
-    def __init__(self, image, message):
+    def __init__(self, image, message, content_type):
         self.image = image
         self.message = message
+        self.content_type = content_type
 
     def initial_validation(self):
-        if self.message == "":
+        if(not(self.content_type == "image/png" or self.content_type == "image/jpeg")):
             raise HTTPException(
-                status_code=400, detail="Message cannot be empty.")
-        if self.image == "":
-            raise HTTPException(
-                status_code=400, detail="Image cannot be empty.")
-
-    def remove_prefix(self):
-        if(re.search('^data:image/.+;base64,', self.image) == None):
-            raise HTTPException(
-                status_code=400, detail="base64 image data with prefix 'data:image/{format};base64,' is needed to encode a message.")
-        self.data = re.sub('^data:image/.+;base64,', '',
-                           self.image)
-
-    def decode_from_base64(self):
-        try:
-            self.image_data = base64.b64decode(self.data)
-        #  will raise error only if string is not base64. It doesn't know about image data.
-        except Exception:
-            raise HTTPException(
-                status_code=400, detail="Invalid base64-encoded string.")
+                status_code=400, detail="Unsupported image format. Currently supported formats: image/jpeg, image/png.")
 
     def convert_to_rgb(self):
         try:
-            with Image.open(BytesIO(self.image_data)) as self.im:
+            with Image.open(BytesIO(self.image)) as self.im:
                 self.im = self.im.convert("RGB")
-
-        # occurs if base64 string was not image data
-        except Exception:
+        except Exception as e:
             raise HTTPException(
-                status_code=400, detail="base64 image data with prefix 'data:image/{format};base64,' is needed to encode a message.")
+                status_code=400, detail="Unable to convert image mode to RGB" + str(e))
 
     def convert_message_to_binary(self):
         self.encoded_message = ""
@@ -79,9 +59,9 @@ class encode:
                     raise Exception()
 
                 self.encoded_message = self.encoded_message + utf8_style
-        except Exception:
+        except Exception as e:
             raise HTTPException(
-                status_code=500, detail="Unknown error occured while processing the message text.")
+                status_code=500, detail="Unexpected error while processing the message text." + str(e))
 
     def put_message_in_image(self):
         try:
@@ -127,21 +107,25 @@ class encode:
                 pixel_number[0] = 0
                 pixel_number[1] = pixel_number[1] + 1
 
-    def convert_PIL_image_to_data64(self):
+    def convert_to_buffered(self):
         buffered = BytesIO()
         self.im.save(buffered, format="png")
-        l = len(str(base64.b64encode(buffered.getvalue())))
-        return "data:image/png;base64,"+str(base64.b64encode(buffered.getvalue()))[2:l-1]
+        return buffered.getvalue()
 
     def run(self):
         try:
             self.initial_validation()
-            self.remove_prefix()
-            self.decode_from_base64()
             self.convert_to_rgb()
             self.convert_message_to_binary()
             self.put_message_in_image()
-            image = self.convert_PIL_image_to_data64()
-            return({"image": image, "noOfPixelsModified": self.pixel_count, "percentOfImageModified": (self.pixel_count/(self.im.width*self.im.height))*100})
+            return(
+                {
+                    "buffered": self.convert_to_buffered(),
+                    "noOfPixelsModified": str(self.pixel_count), "percentOfImageModified": str(
+                        self.pixel_count/(self.im.width*self.im.height)*100
+                    )
+                }
+            )
+
         except:
             raise

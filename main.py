@@ -1,8 +1,9 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Form, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import Response
 from encode import encode as e
 from decode import decode as d
-from pydantic import BaseModel
+
 
 app = FastAPI()
 
@@ -12,33 +13,31 @@ app.add_middleware(
     allow_methods=["*"]
 )
 
-
-class Encode(BaseModel):
-    message: str
-    image: str
-
-
-class Decode(BaseModel):
-    image: str
-
 # POST request because browsers do not allow GET request with a body
 
 
-@app.post("/encode")
-async def encode(encode_: Encode, request_: Request):
+@app.post("/encode", response_class=Response)
+async def encode(message: str = Form(...), image: UploadFile = File(...)):
     try:
-        await request_.body()
-        result = e(encode_.image, encode_.message).run()
-        return result
+        contents = await image.read()
+        result = e(contents, message, image.content_type).run()
+
+        return Response(content=result["buffered"],
+                        media_type='image/png',
+                        headers={
+            "percentOfImageModified": result["percentOfImageModified"],
+            "noOfPixelsModified": result["noOfPixelsModified"]
+        }
+        )
     except:
         raise
 
 
 @app.post("/decode")
-async def decode(decode_: Decode, request_: Request):
+async def decode(image: UploadFile = File(...)):
     try:
-        await request_.body()
-        result = d(decode_.image).run()
+        contents = await image.read()
+        result = d(contents, image.content_type).run()
         return result
     except:
         raise
@@ -46,4 +45,4 @@ async def decode(decode_: Decode, request_: Request):
 
 @app.get("/")
 async def root():
-    return {"message": "Hello World!"}
+    return {"message": "hidden-api"}
