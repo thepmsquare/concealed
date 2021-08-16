@@ -25,8 +25,9 @@ async def encode(message: str = Form(...), image: UploadFile = File(...)):
         return Response(content=result["buffered"],
                         media_type='image/png',
                         headers={
-            "percentOfImageModified": result["percentOfImageModified"],
-            "noOfPixelsModified": result["noOfPixelsModified"]
+                            "percentOfImageModified": result["percentOfImageModified"],
+                            "noOfPixelsModified": result["noOfPixelsModified"],
+                            "Access-Control-Expose-Headers": "percentOfImageModified, noOfPixelsModified"
         }
         )
     except:
