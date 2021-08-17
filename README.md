@@ -13,5 +13,6 @@ Note: APNG or other animated image inputs will have unintended transformations i
 
 ### output
 
-Note: Output file will be in 3x8-bit pixels, RGB mode, regardless of the input.
+Note: Output image will be in RGB / RGBA mode only.
+
 PNG
