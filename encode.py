@@ -21,7 +21,7 @@ class encode:
                 self.im = self.im.convert("RGB")
         except Exception as e:
             raise HTTPException(
-                status_code=400, detail="Unable to convert image mode to RGB" + str(e))
+                status_code=400, detail="Unable to convert image mode to RGB. " + str(e))
 
     def convert_message_to_binary(self):
         self.encoded_message = ""
@@ -61,7 +61,7 @@ class encode:
                 self.encoded_message = self.encoded_message + utf8_style
         except Exception as e:
             raise HTTPException(
-                status_code=500, detail="Unexpected error while processing the message text." + str(e))
+                status_code=500, detail="Unexpected error while processing the message text. " + str(e))
 
     def put_message_in_image(self):
         try:

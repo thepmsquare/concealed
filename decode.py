@@ -22,7 +22,7 @@ class decode:
         # occurs if base64 string was not image data
         except Exception as e:
             raise HTTPException(
-                status_code=400, detail="Unable to convert image mode to RGB" + str(e))
+                status_code=400, detail="Unable to convert image mode to RGB. " + str(e))
 
     def get_2n_bits(self, number):
         result = ""
