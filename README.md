@@ -13,6 +13,6 @@ Note: APNG or other animated image inputs will have unintended transformations i
 
 ### output
 
-Note: Output image will be in RGB / RGBA mode only.
+Note: Output image will be in RGBA mode only.
 
 PNG
