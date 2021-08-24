@@ -2,6 +2,8 @@
 
 FastAPI application, meant to be used for encoding and decoding messages in images / steganography.
 
+Note: It is encouraged to not use plain text as messages. [Reference for Advanced Encryption Standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard).
+
 ## supported formats for encode
 
 ### input
