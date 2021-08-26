@@ -14,6 +14,7 @@ Note: It is encouraged to not use plain text as messages. [Reference for Advance
 Note: APNG or other animated image inputs will have unintended transformations in the encoded image.
 
 ### output
+
 - PNG
 
-Note: Output image will be in RGBA color mode only.
+Note: Output image will be in RGB / RGBA color modes only.

@@ -18,7 +18,10 @@ class encode:
     def convert_to_rgb(self):
         try:
             with Image.open(BytesIO(self.image)) as self.im:
-                self.im = self.im.convert("RGBA")
+                if self.im.mode == "RGBA":
+                    self.im = self.im.convert("RGBA")
+                else:
+                    self.im = self.im.convert("RGB")
         except Exception as e:
             raise HTTPException(
                 status_code=400, detail="Unable to convert image mode to RGB. " + str(e))
@@ -98,9 +101,13 @@ class encode:
                     format(pixels[pixel_number[0], pixel_number[1]][2], '08b')[0:6]+bm, 2)
             else:
                 b = pixels[pixel_number[0], pixel_number[1]][2]
-            a = pixels[pixel_number[0], pixel_number[1]][3]
+            if self.im.mode == "RGBA":
+                a = pixels[pixel_number[0], pixel_number[1]][3]
             self.pixel_count = self.pixel_count + 1
-            pixels[pixel_number[0], pixel_number[1]] = (r, g, b, a)
+            if self.im.mode == "RGBA":
+                pixels[pixel_number[0], pixel_number[1]] = (r, g, b, a)
+            else:
+                pixels[pixel_number[0], pixel_number[1]] = (r, g, b)
             if(pixel_number[0] < self.im.width-1):
                 pixel_number[0] = pixel_number[0] + 1
             else:
