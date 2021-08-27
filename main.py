@@ -6,13 +6,10 @@ from decode import decode as d
 
 
 app = FastAPI()
-origins = [
-    "https://thepmsquare.github.io/",
-    "http://localhost:3000"
-]
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
