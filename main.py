@@ -5,7 +5,7 @@ from encode import encode as e
 from decode import decode as d
 import json
 
-app = FastAPI()
+app = FastAPI(debug=True)
 
 app.add_middleware(
     CORSMiddleware,
@@ -45,7 +45,8 @@ async def decode(image: UploadFile = File(...)):
                         headers={
                             "Access-Control-Allow-Origin": "*"
         })
-    except:
+    except Exception as e:
+        print(e)
         raise
 
 
