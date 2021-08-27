@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from encode import encode as e
 from decode import decode as d
-
+import json
 
 app = FastAPI()
 
@@ -36,16 +36,20 @@ async def encode(message: str = Form(...), image: UploadFile = File(...)):
         raise
 
 
-@app.post("/decode")
+@app.post("/decode", response_class=Response)
 async def decode(image: UploadFile = File(...)):
     try:
         contents = await image.read()
         result = d(contents, image.content_type).run()
-        return result
+        return Response(content=json.dumps(result),
+                        media_type="application/json",
+                        headers={
+                            "Access-Control-Allow-Origin": "*"
+        })
     except:
         raise
 
 
-@app.get("/")
+@ app.get("/")
 async def root():
     return {"message": "hidden-api"}
