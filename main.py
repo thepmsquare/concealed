@@ -7,12 +7,6 @@ import json
 
 app = FastAPI(debug=True)
 
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["*"],
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
 
 # POST request because browsers do not allow GET request with a body
 
@@ -53,3 +47,10 @@ async def decode(image: UploadFile = File(...)):
 @ app.get("/")
 async def root():
     return {"message": "hidden-api"}
+
+app = CORSMiddleware(
+    app=app,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
