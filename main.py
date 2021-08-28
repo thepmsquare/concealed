@@ -7,8 +7,6 @@ from decode import decode as d
 import json
 
 
-middleware = [Middleware(CORSMiddleware, allow_origins=[
-                         '*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*'])]
 app = FastAPI()
 
 # POST request because browsers do not allow GET request with a body
@@ -50,4 +48,5 @@ async def decode(image: UploadFile = File(...)):
 @app.get("/")
 async def root():
     return {"message": "hidden-api"}
-app.add_middleware(middleware)
+app.add_middleware(Middleware(CORSMiddleware, allow_origins=[
+    '*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*']))
