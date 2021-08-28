@@ -1,6 +1,5 @@
 from fastapi import FastAPI, Form, File, UploadFile
-from starlette.middleware import Middleware
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from encode import encode as e
 from decode import decode as d
@@ -8,6 +7,13 @@ import json
 
 
 app = FastAPI()
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # POST request because browsers do not allow GET request with a body
 
@@ -22,8 +28,8 @@ async def encode(message: str = Form(...), image: UploadFile = File(...)):
                         media_type='image/png',
                         headers={
                             "percentOfImageModified": result["percentOfImageModified"],
-                            "noOfPixelsModified": result["noOfPixelsModified"],
-                            "Access-Control-Expose-Headers": "percentOfImageModified, noOfPixelsModified"
+                            "noOfPixelsModified": result["noOfPixelsModified"], "Access-Control-Allow-Origin": "*",
+                            "Access-Control-Expose-Headers": "percentOfImageModified, noOfPixelsModified, Access-Control-Allow-Origin"
         }
         )
     except:
@@ -38,7 +44,7 @@ async def decode(image: UploadFile = File(...)):
         return Response(content=json.dumps(result),
                         media_type="application/json",
                         headers={
-                            "Access-Control-Allow-Origin": "*"
+                            "Access-Control-Allow-Origin": "*", "Access-Control-Expose-Headers": "Access-Control-Allow-Origin"
         })
     except Exception as e:
         print(e)
@@ -48,5 +54,3 @@ async def decode(image: UploadFile = File(...)):
 @app.get("/")
 async def root():
     return {"message": "hidden-api"}
-app.add_middleware(Middleware(CORSMiddleware, allow_origins=[
-    '*'], allow_credentials=True, allow_methods=['*'], allow_headers=['*']))
