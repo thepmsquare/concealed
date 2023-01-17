@@ -1,5 +1,3 @@
-
-
 from io import BytesIO
 from PIL import Image
 from fastapi import HTTPException
@@ -29,11 +27,11 @@ class decode:
         try:
             for _ in range(0, number):
                 result = result + \
-                    bin(self.pixels[self.pixel_number[0],
-                                    self.pixel_number[1]][self.pixel_number[2]])[2:].zfill(8)[6:8]
+                         bin(self.pixels[self.pixel_number[0],
+                         self.pixel_number[1]][self.pixel_number[2]])[2:].zfill(8)[6:8]
                 # to get next r g or b value of the pixel.
                 if (self.pixel_number[2] == 2):
-                    if(self.pixel_number[0] < self.im.width-1):
+                    if (self.pixel_number[0] < self.im.width - 1):
                         self.pixel_number[0] = self.pixel_number[0] + 1
                     else:
                         self.pixel_number[0] = 0
@@ -70,7 +68,7 @@ class decode:
                 else:
                     current_chr = current_chr + self.get_2n_bits(1)
                     # 2 bit
-                    if(current_chr[0:3] == "110"):
+                    if (current_chr[0:3] == "110"):
                         append_this = current_chr[3:] + self.get_2n_bits(2)
                         if self.get_2n_bits(1) != "10":
                             raise HTTPException(
@@ -78,7 +76,7 @@ class decode:
                         append_this = append_this + self.get_2n_bits(3)
                         self.binary_data.append(append_this)
                     # 3 bit
-                    elif(current_chr == "1110"):
+                    elif (current_chr == "1110"):
                         append_this = self.get_2n_bits(2)
                         if self.get_2n_bits(1) != "10":
                             raise HTTPException(
@@ -92,7 +90,7 @@ class decode:
                     else:
                         current_chr = current_chr + self.get_2n_bits(1)
                         # 4 bits
-                        if(current_chr[0:5] == "11110"):
+                        if (current_chr[0:5] == "11110"):
                             append_this = current_chr[5:] + self.get_2n_bits(1)
                             if self.get_2n_bits(1) != "10":
                                 raise HTTPException(
