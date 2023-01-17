@@ -1,0 +1,1 @@
+{"id":"42b1611a-8d41-432f-8f81-a571bce7b6b7","space":48429,"runtime":"python3.9","name":"hidden-api","path":"ycxyc3","project":"d0ntq14j","account":"144798365827","region":"ap-south-1","deps":["python-multipart==0.0.5","fastapi==0.68.0","Pillow==8.3.1","uvicorn==0.13.4"],"envs":null,"public":true,"log_level":"off","cron":""}
