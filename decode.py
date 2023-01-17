@@ -1,7 +1,7 @@
-from PIL import Image
-import re
+
+
 from io import BytesIO
-import base64
+from PIL import Image
 from fastapi import HTTPException
 
 

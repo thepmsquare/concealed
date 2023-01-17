@@ -1,9 +1,10 @@
+import json
+
 from fastapi import FastAPI, Form, File, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 from encode import encode as e
 from decode import decode as d
-import json
 
 
 app = FastAPI()

@@ -1,5 +1,5 @@
 from PIL import Image
-import re
+
 from io import BytesIO
 from fastapi import HTTPException
 
