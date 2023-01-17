@@ -27,7 +27,7 @@ Note: Output image will be in RGB / RGBA color modes only.
 
 > Clone / Download zip
 
-> run "pip install -r requirements.txt" (httptools and uvloop are not required for locally running the app) (will require python>=3.9.6 and pip>=21.2.4)
+> run "pip install -r requirements.txt" (will require python>=3.9.6 and pip>=21.2.4)
 
 > run "uvicorn main:app --reload"
 
