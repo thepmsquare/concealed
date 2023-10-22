@@ -1,34 +1,51 @@
-# hidden-api
+# concealed
 
-FastAPI application, meant to be used for encoding and decoding messages in images i.e. steganography.
+## about
 
-Implementation of steganography using the least significant bits of the RGB values of an image.
+python util module to provide encryption and decryption using steganography using the least significant bits of the RGB values of an image on top of advanced encryption standard. [reference for advanced encryption standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard).
 
-Note: It is encouraged to not use plain text as messages. [Reference for Advanced Encryption Standard](https://en.wikipedia.org/wiki/Advanced_Encryption_Standard).
+## installation
 
-![](hidden-api.png)
+> pip install concealed
+
+## usage
+
+[reference python file](./example.py)
 
 ## Supported formats
 
 ### input
 
-- PNG
-- JPEG
+- png
+- jpeg
+- webp
 
-Note: APNG or other animated image inputs will have unintended transformations in the encoded image.
+> note: apng or other animated image inputs will have unintended transformations in the encoded image.
 
 ### output
 
-- PNG
+- png
 
-Note: Output image will be in RGB / RGBA color modes only.
+> note: output image will be in rgb / rgba color modes only.
 
-## To check out the project...
+## configs
 
-> Clone / Download zip
+1. concealed\data\config.ini
 
-> run "pip install -r requirements.txt" (will require python>=3.9.6 and pip>=21.2.4)
+## env
 
-> run "uvicorn main:app --reload"
+- python>=3.9.6
 
-Feedback is appreciated. Thank you!
+## changelog
+
+### v2.0.0
+
+- initial implementation as a python module.
+- removed fastapi.
+- validated webp support in input images.
+
+### v1.0.0
+
+- initial implementation using fastapi server.
+
+## Feedback is appreciated. Thank you!

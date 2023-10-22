@@ -1,44 +1,78 @@
+import base64
+import os
 from io import BytesIO
 
 from PIL import Image
-from fastapi import HTTPException
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 
-from hidden_api.configuration import cstr_message_appended_at_end
+from concealed.configuration import cstr_message_appended_at_end, cstr_salt
 
 
-class encode:
-    def __init__(self, image, message, content_type):
-        self.image = image
-        self.message = message
-        self.content_type = content_type
+class Encode:
+    def __init__(
+        self,
+        input_image_path,
+        output_image_folder,
+        output_image_file_name,
+        message_to_hide,
+        password,
+    ):
+        self.input_image_path = input_image_path
+        self.output_image_folder = output_image_folder
+        self.output_image_file_name = output_image_file_name
+        self.im = None
+        self.encoded_message = None
+        self.max_length = None
+        self.pixel_count = None
+        try:
+            if password is not None:
+                password_bytes = password.encode()
+                salt = cstr_salt.encode()
 
-    def initial_validation(self):
-        if not (self.content_type == "image/png" or self.content_type == "image/jpeg"):
-            raise HTTPException(
-                status_code=400,
-                detail="Unsupported image format. Currently supported formats: image/jpeg, image/png.",
+                kdf = PBKDF2HMAC(
+                    algorithm=hashes.SHA256(), iterations=100000, salt=salt, length=32
+                )
+                self.message_to_hide = (
+                    Fernet(base64.urlsafe_b64encode(kdf.derive(password_bytes)))
+                    .encrypt(message_to_hide.encode())
+                    .decode()
+                )
+            else:
+                self.message_to_hide = message_to_hide
+        except Exception:
+            raise
+
+    @staticmethod
+    def initial_validation(content_type):
+        if not (
+            content_type.lower() == "png"
+            or content_type.lower() == "jpeg"
+            or content_type.lower() == "webp"
+        ):
+            raise Exception(
+                "Unsupported image format. Currently supported formats: image/jpeg, image/png, image/webp.",
             )
 
     def convert_to_rgb(self):
         try:
-            with Image.open(BytesIO(self.image)) as self.im:
+            with Image.open(self.input_image_path) as self.im:
+                self.initial_validation(self.im.format)
                 if self.im.mode == "RGBA":
                     self.im = self.im.convert("RGBA")
                 else:
                     self.im = self.im.convert("RGB")
-        except Exception as e:
-            raise HTTPException(
-                status_code=400, detail="Unable to convert image mode to RGB. " + str(e)
-            )
+        except Exception:
+            raise
 
     def convert_message_to_binary(self):
         self.encoded_message = ""
-        utf8_style = ""
+
         try:
-            for i in self.message:
+            for i in self.message_to_hide:
                 unicode_number = ord(i)
                 unicode_number_in_binary = format(ord(i), "b")
-                utf8_style = ""
                 if unicode_number < 128:
                     utf8_style = unicode_number_in_binary.zfill(8)
 
@@ -76,30 +110,24 @@ class encode:
                     )
 
                 else:
-                    raise Exception()
+                    raise Exception("Unrecognized character in message_to_hide.")
 
                 self.encoded_message = self.encoded_message + utf8_style
-        except Exception as e:
-            raise HTTPException(
-                status_code=500,
-                detail="Unexpected error while processing the message text. " + str(e),
-            )
+        except Exception:
+            raise
 
     def put_message_in_image(self):
         try:
             pixels = self.im.load()
-        except:
-            raise HTTPException(
-                status_code=500, detail="Unknown error while loading image."
-            )
+        except Exception:
+            raise
 
         final_encoded_message = self.encoded_message + cstr_message_appended_at_end
         msg_length = len(final_encoded_message)
         self.max_length = self.im.width * self.im.height * 3 * 2
         if msg_length > self.max_length:
-            raise HTTPException(
-                status_code=400,
-                detail="Image with more pixels needed for encoding current message.",
+            raise Exception(
+                "Image with more pixels needed for encoding current message_to_hide.",
             )
 
         pixel_number = [0, 0]
@@ -130,10 +158,9 @@ class encode:
                 )
             else:
                 b = pixels[pixel_number[0], pixel_number[1]][2]
-            if self.im.mode == "RGBA":
-                a = pixels[pixel_number[0], pixel_number[1]][3]
             self.pixel_count = self.pixel_count + 1
             if self.im.mode == "RGBA":
+                a = pixels[pixel_number[0], pixel_number[1]][3]
                 pixels[pixel_number[0], pixel_number[1]] = (r, g, b, a)
             else:
                 pixels[pixel_number[0], pixel_number[1]] = (r, g, b)
@@ -150,17 +177,31 @@ class encode:
 
     def run(self):
         try:
-            self.initial_validation()
             self.convert_to_rgb()
             self.convert_message_to_binary()
             self.put_message_in_image()
+            if not os.path.exists(self.output_image_folder):
+                os.makedirs(self.output_image_folder)
+            if self.output_image_folder[-1] == os.sep:
+                output_file_path = (
+                    self.output_image_folder + self.output_image_file_name + ".png"
+                )
+            else:
+                output_file_path = (
+                    self.output_image_folder
+                    + os.sep
+                    + self.output_image_file_name
+                    + ".png"
+                )
+            self.im.save(output_file_path, format="PNG")
+
             return {
-                "buffered": self.convert_to_buffered(),
-                "noOfPixelsModified": str(self.pixel_count),
-                "percentOfImageModified": str(
+                "output_file_path": output_file_path,
+                "no_of_pixels_modified": str(self.pixel_count),
+                "percent_of_image_modified": str(
                     self.pixel_count / (self.im.width * self.im.height) * 100
                 ),
             }
 
-        except:
+        except Exception:
             raise
